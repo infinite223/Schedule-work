@@ -6,15 +6,14 @@ const prisma = new PrismaClient();
 
 // create user
 router.post('/', async (req, res) => {
-    const { email, name, userName, workPlaceId } = req.body
+    const { email, name, userName } = req.body
 
     try {
         const result = await prisma.user.create({
             data: {
                 email,
                 name,
-                userName,
-                workPlaceId
+                userName
             }
         })
 

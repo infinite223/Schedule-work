@@ -12,14 +12,36 @@ datasource db {
 
 model User {
   id Int @id @default(autoincrement())
-  email String @unique
+  email String? @unique
 
-  name String
+  name String?
   userName String?
 
-  workPlaceId Int
-  workPlace WorkPlace @relation(fields: [workPlaceId], references: [id])
+  workPlaceId Int?
+  workPlace WorkPlace? @relation(fields: [workPlaceId], references: [id])
+
+  tokens Token[]
 }
+
+model Token {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  type String
+  emailToken String? @unique
+
+  valid Boolean @default(true)
+  expiration DateTime
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+// enum TokenType {
+//   EMAIL
+//   API
+// }
 
 model Group {
   id Int @id @default(autoincrement())
