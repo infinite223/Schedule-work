@@ -54,6 +54,7 @@ model Group {
 
 model WorkPlace {
   id Int @id @default(autoincrement())
+  name String?
   
   users User[]
 
