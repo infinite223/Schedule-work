@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const router = Router();
-// create group
+
 router.post('/', async (req, res) => {
     const { name, description, workPlaceId } = req.body;
     //@ts-ignore
@@ -24,24 +24,38 @@ router.post('/', async (req, res) => {
 
     res.status(200)
 })
-//get group list
-router.get('/', (req, res) => {
-    res.status(501).json({error: "Not implemented"})
+
+router.get('/', async (req, res) => {
+    const groups = await prisma.group.findMany();
+    res.json(groups)
 })
-//get group by id
-router.get('/:id', (req, res) => {
+
+router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    res.status(501).json({error: `Not implemented: ${id}`})
+    const group = await prisma.group.findUnique({where: { id: Number(id)}});
+    res.json(group)
 })
-//update group
-router.put('/:id', (req, res) => {
+
+router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    res.status(501).json({error: `Not implemented: ${id}`})
+    const { name, description } = req.body
+    
+    try {
+        const result = await prisma.group.update({
+            where: {id: Number(id)},
+            data: { name, description }
+        })
+
+        res.json(result)
+    } catch (e) {
+        res.status(400).json({error: "Faild to update the workplace"})
+    }
 })
-//delete group
-router.delete('/:id', (req, res) => {
+
+router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    res.status(501).json({error: `Not implemented: ${id}`})
+    await prisma.group.delete({where: { id: Number(id) }})
+    res.sendStatus(200)
 })
 
 export default router

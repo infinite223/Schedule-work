@@ -22,9 +22,7 @@ const generateAuthToken = (tokenId:number) => {
 
 const prisma = new PrismaClient();
 const router = Router();
-// create a user
-// generate email token
-// send to email  
+
 router.post('/login', async (req, res) => {
     const { email } = req.body;
     const emailToken = generateEmailToken()
@@ -44,9 +42,7 @@ router.post('/login', async (req, res) => {
                 }
             }
         })
-        
-        console.log(createdToken)
-        //send token to users emails
+
         await sendEmailToken(email, emailToken)
         res.sendStatus(200);
     } catch (e) {
@@ -54,12 +50,10 @@ router.post('/login', async (req, res) => {
     }
 })
 
-// validate email token 
-// generate a long lived JWT token
 router.post('/authenticate', async (req, res) => {
     const { email, emailToken } = req.body;
     const expiration = new Date(new Date().getTime() + AUTHENTICATION_TOKEN_EXPIRATION_HOURS * 60 * 60 * 1000)
-
+    console.log(email, emailToken, 'dadda')
     const dbEmailToken = await prisma.token.findUnique({
         where: {
             emailToken
@@ -68,7 +62,6 @@ router.post('/authenticate', async (req, res) => {
             user: true
         }
     })
-    console.log(dbEmailToken)
 
     if(!dbEmailToken || !dbEmailToken.valid){
         return res.sendStatus(401)
@@ -102,9 +95,13 @@ router.post('/authenticate', async (req, res) => {
     })
 
     const authToken = generateAuthToken(apiToken.id);
+    const user = await prisma.user.findUnique({
+        where: {
+            email
+        }
+    })
 
-
-    res.json({ authToken })
+    res.json({ authToken, user })
 })
 
 export default router

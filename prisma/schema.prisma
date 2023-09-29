@@ -20,6 +20,9 @@ model User {
   workPlaceId Int?
   workPlace WorkPlace? @relation(fields: [workPlaceId], references: [id])
 
+  groupId Int?
+  group Group? @relation(fields: [groupId], references: [id])
+
   tokens Token[]
 }
 
@@ -50,11 +53,14 @@ model Group {
 
   workPlaceId Int
   workPlace WorkPlace @relation(fields: [workPlaceId], references: [id])
+
+  users User[]
 }
 
 model WorkPlace {
   id Int @id @default(autoincrement())
   name String?
+  adminId String?
   
   users User[]
 

@@ -4,7 +4,6 @@ import { PrismaClient } from '@prisma/client'
 const router = Router();
 const prisma = new PrismaClient();
 
-// create user
 router.post('/', async (req, res) => {
     const { email, name, userName } = req.body
 
@@ -23,22 +22,22 @@ router.post('/', async (req, res) => {
     }
 
 })
-//get users list
+
 router.get('/', async (req, res) => {
     const allUsers = await prisma.user.findMany();
     res.json(allUsers)
 })
-//get user by id
+
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const user = await prisma.user.findUnique({where: { id: Number(id)}});
     res.json(user)
 })
-//update user
+
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
         const { name, userName } = req.body
-        
+        console.log(name, userName)
     try {
         const result = await prisma.user.update({
             where: {id: Number(id)},
@@ -50,7 +49,7 @@ router.put('/:id', async (req, res) => {
         res.status(400).json({error: "Faild to update the user"})
     }
 })
-//delete user
+
 router.delete('/:id', async (req, res) => {
    const { id } = req.params;
 

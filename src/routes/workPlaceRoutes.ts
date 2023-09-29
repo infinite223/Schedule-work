@@ -1,28 +1,61 @@
+import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 
 const router = Router();
-// create workPlace
-router.post('/', (req, res) => {
-    res.status(501).json({error: "Not implemented"})
+const prisma = new PrismaClient();
+
+router.post('/', async (req, res) => {
+    const { name } = req.body;
+    //@ts-ignore
+   const user = req.user
+
+   try {
+    const result = await prisma.workPlace.create({
+        data: {
+            name,
+            adminId: user.id
+        }
+    })
+
+    res.json(result)
+   } catch (e) {
+    res.status(400).json({error: "Username and email should be unique"})
+   }
+
+    res.status(200)
 })
-//get workPlace list
-router.get('/', (req, res) => {
-    res.status(501).json({error: "Not implemented"})
+
+router.get('/',  async (req, res) => {
+    const workPlace = await prisma.workPlace.findMany();
+    res.json(workPlace)
 })
-//get workPlace by id
-router.get('/:id', (req, res) => {
+
+router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    res.status(501).json({error: `Not implemented: ${id}`})
+    const workPlace = await prisma.workPlace.findUnique({where: { id: Number(id)}});
+    res.json(workPlace)
 })
-//update workPlace
-router.put('/:id', (req, res) => {
+
+router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    res.status(501).json({error: `Not implemented: ${id}`})
+    const { name, groups, users } = req.body
+    
+    try {
+        const result = await prisma.workPlace.update({
+            where: {id: Number(id)},
+            data: { name, groups, users }
+        })
+
+        res.json(result)
+    } catch (e) {
+        res.status(400).json({error: "Faild to update the workplace"})
+    }
 })
-//delete workPlace
-router.delete('/:id', (req, res) => {
+
+router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    res.status(501).json({error: `Not implemented: ${id}`})
+    await prisma.workPlace.delete({where: { id: Number(id) }})
+    res.sendStatus(200)
 })
 
 export default router

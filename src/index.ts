@@ -8,7 +8,6 @@ import { authenticateToken } from './middlewares/authMiddleware'
 const app = experss(); 
 app.use(experss.json());
 
-
 app.use("/user", authenticateToken,  userRoutes)
 app.use("/workPlace", workPlaceRouters)
 app.use("/group", authenticateToken, groupRoutes)
