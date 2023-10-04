@@ -5,16 +5,20 @@ const prisma = new PrismaClient();
 const router = Router();
 
 router.post('/', async (req, res) => {
-    const { name, description, workPlaceId } = req.body;
+    const { from, to, dayId, userId } = req.body;
     //@ts-ignore
    const user = req.user
 
    try {
-    const result = await prisma.group.create({
+    const result = await prisma.userInDay.create({
         data: {
-            name, description, workPlaceId
+            from,
+            to,
+            dayId,
+            userId: user.id
         }
     })
+
     console.log(result, 'ee')
     res.json(result)
    } catch (e) {
@@ -26,29 +30,26 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    const { workPlaceId } = req.body;
-    console.log(workPlaceId)
-    const groups = await prisma.group.findMany({ where: {workPlaceId: Number(workPlaceId)} });
-    res.json(groups)
+    const { dayId } = req.body;
+
+    const usersInDay = await prisma.userInDay.findMany({where: { dayId }});
+    res.json(usersInDay)
 })
 
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    const groups = await prisma.group.findMany({ 
-        where: {workPlaceId: Number(id)},
-        include: { users: { where: { workPlaceId: Number(id) } } }
-     });
-    res.json(groups)
+    const day = await prisma.userInDay.findUnique({where: { id: Number(id)}});
+    res.json(day)
 })
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, description } = req.body
+    const { from, to } = req.body
     
     try {
-        const result = await prisma.group.update({
+        const result = await prisma.userInDay.update({
             where: {id: Number(id)},
-            data: { name, description }
+            data: { from, to }
         })
 
         res.json(result)
@@ -59,7 +60,7 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    await prisma.group.delete({where: { id: Number(id) }})
+    await prisma.userInDay.delete({where: { id: Number(id) }})
     res.sendStatus(200)
 })
 

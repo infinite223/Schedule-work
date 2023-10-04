@@ -17,6 +17,8 @@ model User {
   name String?
   userName String?
 
+  phoneNumber Int?
+
   workPlaceId Int?
   workPlace WorkPlace? @relation(fields: [workPlaceId], references: [id])
 
@@ -24,6 +26,7 @@ model User {
   group Group? @relation(fields: [groupId], references: [id])
 
   tokens Token[]
+  userInDay UserInDay[]
 }
 
 model Token {
@@ -41,11 +44,6 @@ model Token {
   user User @relation(fields: [userId], references: [id])
 }
 
-// enum TokenType {
-//   EMAIL
-//   API
-// }
-
 model Group {
   id Int @id @default(autoincrement())
   name String 
@@ -55,6 +53,29 @@ model Group {
   workPlace WorkPlace @relation(fields: [workPlaceId], references: [id])
 
   users User[]
+  days Day[]
+}
+
+model Day {
+  id Int @id @default(autoincrement())
+  date String @unique
+  
+  groupId Int
+  group Group @relation(fields: [groupId], references: [id])
+
+  usersInDay UserInDay[]
+}
+
+model UserInDay {
+  id Int @id @default(autoincrement())
+  from String  
+  to String
+
+  dayId Int
+  day Day @relation(fields: [dayId], references: [id])
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
 }
 
 model WorkPlace {
