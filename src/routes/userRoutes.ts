@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
                 email,
                 name,
                 userName,
-                phoneNumber
+                phoneNumber,
             }
         })
 
@@ -29,6 +29,19 @@ router.get('/', async (req, res) => {
     res.json(allUsers)
 })
 
+router.get('/usersInWorkPace/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    const users = await prisma.user.findMany({
+        where: {
+            workPlaceId: Number(id),
+            groupId: null
+        }
+    });
+
+    res.json(users)
+})
+
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     console.log(id, 'd')
@@ -39,12 +52,12 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-        const { name, userName, phoneNumber } = req.body
-        console.log(name, phoneNumber)
+        const { name, userName, phoneNumber, groupId } = req.body
+        console.log(name, userName, phoneNumber, groupId,'edit')
     try {
         const result = await prisma.user.update({
             where: {id: Number(id)},
-            data: { name, userName, phoneNumber: Number(phoneNumber) }
+            data: { name, userName, phoneNumber: Number(phoneNumber), groupId: Number(groupId) }
         })
 
         console.log(result)
@@ -60,6 +73,24 @@ router.delete('/:id', async (req, res) => {
 
    await prisma.user.delete({where: { id: Number(id) }})
    res.sendStatus(200)
+})
+
+
+router.post('/removeUserFromGroup', async (req, res) => {
+    const { userId, groupId } = req.body
+    console.log(userId, groupId , "remove")
+    try {
+        const result = await prisma.group.update({where: {
+            id: Number(groupId)
+        },
+        data: {users: {disconnect: {id: Number(userId)}}}
+    })
+
+        res.json(result)
+    } catch (e) {
+        res.status(400).json({error: "Nazwa użytkownika lub email jest już zajęty"})
+    }
+
 })
 
 export default router

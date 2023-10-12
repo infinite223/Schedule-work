@@ -12,7 +12,7 @@ app.use(experss.json());
 
 app.use("/user", authenticateToken,  userRoutes)
 app.use("/workPlace", workPlaceRouters)
-app.use("/group", authenticateToken, groupRoutes)
+app.use("/group", authenticateToken, groupRoutes)   
 app.use("/day",authenticateToken, dayRoutes)
 app.use("/userInDay",authenticateToken, userInDay)
 app.use("/auth", authRoutes)

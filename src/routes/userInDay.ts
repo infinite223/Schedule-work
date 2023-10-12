@@ -36,12 +36,28 @@ router.get('/', async (req, res) => {
     res.json(usersInDay)
 })
 
-router.get('/:id', async (req, res) => {
-    const { id } = req.params;
-    const day = await prisma.userInDay.findUnique({where: { id: Number(id)}});
-    res.json(day)
-})
+// router.get('/:id', async (req, res) => {
+//     const { id } = req.params;
+//     const day = await prisma.userInDay.findUnique({where: { id: Number(id)}});
+//     res.json(day)
+// })
 
+router.get('/getAllFutureUserInDays', async (req, res) => {
+    const currentDate = new Date();
+
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // +1, bo miesiące są liczone od 0 do 11
+    const day = currentDate.getDate().toString().padStart(2, '0');
+
+    const formattedDate = `${year}/${month}/${day}`
+    //@ts-ignore
+    const user = req.user
+
+    const userInDays = await prisma.userInDay.findMany({ orderBy: {day: {date: "asc"}},include: { day: {}}, where:{ userId: user.id, day: { date: { gte: formattedDate } } }});    
+    console.log(userInDays, 'getAllFutureUserInDays')
+    res.json(userInDays)
+})
+  
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { from, to } = req.body
