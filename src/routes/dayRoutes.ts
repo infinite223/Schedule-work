@@ -28,12 +28,12 @@ router.post('/', async (req, res) => {
 })
 
 router.post('/getSpecyficDay', async (req, res) => {
-    const { date } = req.body;
+    const { date, groupId } = req.body;
      //@ts-ignore
     const user = req.user
-    const day = await prisma.day.findUnique(
+    const day = await prisma.day.findFirst(
         { 
-            where: { date, groupId: user.groupId },
+            where: { date, groupId: groupId,  },
             include: {usersInDay: { include: { user: {} } }}
         }
     );

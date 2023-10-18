@@ -24,6 +24,24 @@ router.post('/', async (req, res) => {
    }
 })
 
+router.post('/addUserToGroup', async (req, res) => {
+    const { userId, groupId } = req.body;
+    //@ts-ignore
+   const user = req.user
+   console.log('tu', user, 's')
+   try {
+    const result = await prisma.group.update({
+        where: { id: Number(groupId)},
+        data: {users: { connect: {id: Number(userId)} }}
+    })
+    console.log(result, 'ee')
+    res.json(result)
+   } catch (e) {
+    console.log(e)
+    res.status(400).json({error: "Username and email should be unique"})
+   }
+})
+
 router.get('/', async (req, res) => {
     const { workPlaceId } = req.body;
     console.log(workPlaceId)
@@ -31,31 +49,27 @@ router.get('/', async (req, res) => {
     res.json(groups)
 })
 
-router.post('/getGroupWithDays/:id', async (req, res) => {
-    const { id } = req.params;
+router.post('/getGroupWithDays', async (req, res) => {
     const { startDate, endDate } = req.body
-    const groups = await prisma.group.findMany({ 
-        where: {workPlaceId: Number(id)},
+    const groups = await prisma.group.findMany({  
         include: { 
             days: { 
                 include: { usersInDay: { include: { user: {} } }}, 
-                // where: { date: {equals: findingDate} }
                 where: {
                     AND: [
                       {
                         date: {
-                          gte: startDate, // Start of the desired month
+                          gte: startDate, 
                         },
                       },
                       {
                         date: {
-                          lt: endDate, // Start of the next month
+                          lt: endDate, 
                         },
                       },
                     ],
                   },
             }, 
-            users: { where: { workPlaceId: Number(id) } } 
         }
      });
 

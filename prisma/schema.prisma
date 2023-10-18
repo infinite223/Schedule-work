@@ -58,7 +58,7 @@ model Group {
 
 model Day {
   id Int @id @default(autoincrement())
-  date String @unique
+  date String 
   
   groupId Int
   group Group @relation(fields: [groupId], references: [id])

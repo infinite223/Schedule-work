@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 import { sendEmailToken } from "../services/emailService";
 
 const EMAIL_TOKEN_EXPIRATION_MINUTES = 10;
-const AUTHENTICATION_TOKEN_EXPIRATION_HOURS = 12;
+const AUTHENTICATION_TOKEN_EXPIRATION_HOURS = 8760; // 1 year
 const JWT_SECRET = "SUPER SECRET"
 
 const generateEmailToken = () => {

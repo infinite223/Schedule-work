@@ -33,7 +33,18 @@ router.get('/',  async (req, res) => {
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const workPlace = await prisma.workPlace.findUnique({where: { id: Number(id)}});
-    res.json(workPlace)
+
+    try {
+        if(workPlace) {
+            res.json(workPlace)
+        }
+        else {
+            res.send(401)
+        }
+    } catch (error) {
+        res.send(404)
+    }
+    
 })
 
 router.put('/:id', async (req, res) => {
@@ -49,6 +60,28 @@ router.put('/:id', async (req, res) => {
         res.json(result)
     } catch (e) {
         res.status(400).json({error: "Faild to update the workplace"})
+    }
+})
+
+router.put('/addUserToWorkPlace/:id', async (req, res) => {
+    const { id } = req.params;
+    const { email } = req.body
+
+    const findUser = await prisma.user.findUnique({where: { email }})
+    console.log(findUser, 'eeee')
+    if(findUser) {
+        try {
+            const result = await prisma.workPlace.update({
+                where: {id: Number(id)},
+                data: { users: {connect: { email }} },
+            })
+    
+            res.json(result)
+        } catch (e) {
+            res.status(400).json({error: "Faild to update the workplace"})
+        }
+    } else {
+        res.status(401).json({error: "Użytkwonik nie istnieje"})
     }
 })
 

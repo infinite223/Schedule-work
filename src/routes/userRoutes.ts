@@ -34,9 +34,17 @@ router.get('/usersInWorkPace/:id', async (req, res) => {
     
     const users = await prisma.user.findMany({
         where: {
-            workPlaceId: Number(id),
-            groupId: null
-        }
+            AND: [
+                { workPlaceId: Number(id) },
+                {
+                    NOT: {
+                        groupId: {
+                            not: null
+                        }
+                    }
+                }
+            ]
+        },
     });
 
     res.json(users)
@@ -52,12 +60,12 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-        const { name, userName, phoneNumber, groupId } = req.body
-        console.log(name, userName, phoneNumber, groupId,'edit')
+        const { name, userName, phoneNumber } = req.body
+        console.log(name, userName, phoneNumber,'edit')
     try {
         const result = await prisma.user.update({
             where: {id: Number(id)},
-            data: { name, userName, phoneNumber: Number(phoneNumber), groupId: Number(groupId) }
+            data: { name, userName, phoneNumber: Number(phoneNumber) }
         })
 
         console.log(result)
