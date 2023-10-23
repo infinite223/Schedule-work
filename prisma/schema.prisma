@@ -6,9 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// PGPASSWORD=nwQ9tFxaDwz5Y0Ej6ucD psql -h containers-us-west-204.railway.app -U postgres -p 5624 -d railway
 
 model User {
   id Int @id @default(autoincrement())

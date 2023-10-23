@@ -25,3 +25,5 @@ app.get('/', (req, res) => {
 app.listen(3000, () => {
     console.log('Server rady on localhost:3000')
 })
+
+export default app
