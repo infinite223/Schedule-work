@@ -7,7 +7,8 @@
     "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.ts",
-    "vercel-build": "echo hello"
+    "vercel-build": "echo hello",
+    "build": "prisma generate && next build"
   },
   "keywords": [],
   "author": "",
