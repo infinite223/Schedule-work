@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { PrismaClient } from '@prisma/client'
+import { formatStringToDate } from "../services/convertStringToDate";
+import { timeCounter } from "../services/timeCounter";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -50,13 +52,66 @@ router.get('/usersInWorkPace/:id', async (req, res) => {
     res.json(users)
 })
 
-router.get('/:id', async (req, res) => {
-    const { id } = req.params;
-    console.log(id, 'd')
+// router.get('/:id', async (req, res) => {
+//     const { id } = req.params;
+//     console.log(id, 'd')
 
-    const user = await prisma.user.findUnique({where: { id: Number(id)}});
-    res.json(user)
+//     const user = await prisma.user.findUnique({where: { id: Number(id)}});
+//     res.json(user)
+// })
+
+router.get('/getHoursPrediction', async (req, res) => {
+    //@ts-ignore
+    const user = req.user
+
+    const currentDate = new Date()
+    const hoursPredictions:any = []
+    
+    const allUsersInDays = await prisma.userInDay.findMany({
+         orderBy: {day: {date: "asc"}}, include: { day: {}}, where:{ userId: 2 }
+    }); 
+
+    let numberHoursFull = {hours: 0, minutes: 0}
+    let numberHoursNow = {hours: 0, minutes: 0}
+    let currentMonth = currentDate.getMonth(); //10
+    const sortedAllUsersInDay:any = []
+    
+    allUsersInDays.forEach((userInDay) => {
+        const userInDayDate = formatStringToDate(userInDay.day.date)
+        const time = timeCounter(userInDay.from, userInDay.to)
+
+        sortedAllUsersInDay.push(
+            {
+                month: userInDayDate.getMonth(),
+                year: userInDayDate.getFullYear(),
+                day: userInDayDate.getDate(),
+                time: {h: time.godziny, m: time.minuty}
+            }
+        )
+    })
+
+    sortedAllUsersInDay?.forEach((element:any) => {
+        if(currentMonth===element.month){
+            numberHoursFull.hours += element.time.h
+            numberHoursFull.minutes += element.time.m
+
+            if(currentDate.getDate()<=element.day) {
+                numberHoursNow.hours += element.time.h
+                numberHoursNow.minutes += element.time.m
+            }
+        }
+    });
+
+    hoursPredictions.push({
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth(),
+        numberHoursFull,
+        numberHoursNow
+    })
+
+    res.json(hoursPredictions)
 })
+
 
 router.put('/:id', async (req, res) => {
     const { id } = req.params;

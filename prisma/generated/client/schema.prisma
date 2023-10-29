@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js" 
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// PGPASSWORD=nwQ9tFxaDwz5Y0Ej6ucD psql -h containers-us-west-204.railway.app -U postgres -p 5624 -d railway
+
+model User {
+  id Int @id @default(autoincrement())
+  email String? @unique
+
+  name String?
+  userName String?
+
+  phoneNumber Int?
+
+  workPlaceId Int?
+  workPlace WorkPlace? @relation(fields: [workPlaceId], references: [id])
+
+  groupId Int?
+  group Group? @relation(fields: [groupId], references: [id])
+
+  tokens Token[]
+  userInDay UserInDay[]
+}
+
+model Token {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  type String
+  emailToken String? @unique
+
+  valid Boolean @default(true)
+  expiration DateTime
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Group {
+  id Int @id @default(autoincrement())
+  name String 
+  description String?
+
+  workPlaceId Int
+  workPlace WorkPlace @relation(fields: [workPlaceId], references: [id])
+
+  users User[]
+  days Day[]
+}
+
+model Day {
+  id Int @id @default(autoincrement())
+  date String 
+  
+  groupId Int
+  group Group @relation(fields: [groupId], references: [id])
+
+  usersInDay UserInDay[]
+}
+
+model UserInDay {
+  id Int @id @default(autoincrement())
+  from String  
+  to String
+
+  dayId Int
+  day Day @relation(fields: [dayId], references: [id])
+
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model WorkPlace {
+  id Int @id @default(autoincrement())
+  name String?
+  adminId String?
+  
+  users User[]
+
+  groups Group[]
+}
