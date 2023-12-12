@@ -57,6 +57,30 @@ router.get('/getAllFutureUserInDays', async (req, res) => {
     console.log(userInDays, 'getAllFutureUserInDays')
     res.json(userInDays)
 })
+// npm production:build
+router.get('/getCurrentMonthUserInDays', async (req, res) => {
+    const currentDate = new Date();
+
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // +1, bo miesiące są liczone od 0 do 11
+    const day = currentDate.getDate().toString().padStart(2, '0');
+
+    const gte = `${year}/${month}/01`
+    const lte = `${year}/${month}/31`
+    //@ts-ignore
+    const user = req.user
+
+    const userInDays = await prisma.userInDay.findMany({ 
+        orderBy: {day: {date: "asc"}}, include: { day: {}}, 
+        where:{ userId: user.id, day: { date: { 
+            gte: gte,
+            lte: lte
+        } } }
+    });    
+    
+    console.log(userInDays, 'getAllFutureUserInDays')
+    res.json(userInDays)
+})
   
 router.put('/:id', async (req, res) => {
     const { id } = req.params;

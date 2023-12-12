@@ -10,11 +10,11 @@ import { authenticateToken } from './middlewares/authMiddleware'
 const app = experss(); 
 app.use(experss.json());
 
-app.use("/user", authenticateToken,  userRoutes)
+app.use("/user",  userRoutes)
 app.use("/workPlace", workPlaceRouters)
-app.use("/group", authenticateToken, groupRoutes)   
-app.use("/day",authenticateToken, dayRoutes)
-app.use("/userInDay",authenticateToken, userInDay)
+app.use("/group",  groupRoutes)   
+app.use("/day", dayRoutes)
+app.use("/userInDay", userInDay)
 app.use("/auth", authRoutes)
 
 
