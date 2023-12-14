@@ -6,8 +6,6 @@ const router = Router();
 
 router.post('/', async (req, res) => {
     const { from, to, dayId, userId } = req.body;
-    //@ts-ignore
-   const user = req.user
 
    try {
     const result = await prisma.userInDay.create({
@@ -15,11 +13,10 @@ router.post('/', async (req, res) => {
             from,
             to,
             dayId,
-            userId: user.id
+            userId
         }
     })
 
-    console.log(result, 'ee')
     res.json(result)
    } catch (e) {
     console.log(e)
@@ -42,7 +39,9 @@ router.get('/', async (req, res) => {
 //     res.json(day)
 // })
 
-router.get('/getAllFutureUserInDays', async (req, res) => {
+router.get('/getAllFutureUserInDays/:userId', async (req, res) => {
+    const { userId } = req.params;
+
     const currentDate = new Date();
 
     const year = currentDate.getFullYear();
@@ -50,15 +49,15 @@ router.get('/getAllFutureUserInDays', async (req, res) => {
     const day = currentDate.getDate().toString().padStart(2, '0');
 
     const formattedDate = `${year}/${month}/${day}`
-    //@ts-ignore
-    const user = req.user
 
-    const userInDays = await prisma.userInDay.findMany({ orderBy: {day: {date: "asc"}},include: { day: {}}, where:{ userId: user.id, day: { date: { gte: formattedDate } } }});    
+    const userInDays = await prisma.userInDay.findMany({ orderBy: {day: {date: "asc"}},include: { day: {}}, where:{ userId: Number(userId), day: { date: { gte: formattedDate } } }});    
     console.log(userInDays, 'getAllFutureUserInDays')
     res.json(userInDays)
 })
 // npm production:build
-router.get('/getCurrentMonthUserInDays', async (req, res) => {
+router.get('/getCurrentMonthUserInDays/:userId', async (req, res) => {
+    const { userId } = req.params;
+
     const currentDate = new Date();
 
     const year = currentDate.getFullYear();
@@ -67,12 +66,10 @@ router.get('/getCurrentMonthUserInDays', async (req, res) => {
 
     const gte = `${year}/${month}/01`
     const lte = `${year}/${month}/31`
-    //@ts-ignore
-    const user = req.user
 
     const userInDays = await prisma.userInDay.findMany({ 
         orderBy: {day: {date: "asc"}}, include: { day: {}}, 
-        where:{ userId: user.id, day: { date: { 
+        where:{ userId: Number(userId), day: { date: { 
             gte: gte,
             lte: lte
         } } }

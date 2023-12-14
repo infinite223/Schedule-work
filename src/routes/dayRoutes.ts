@@ -5,19 +5,16 @@ const prisma = new PrismaClient();
 const router = Router();
 
 router.post('/', async (req, res) => {
-    const { date } = req.body;
-    //@ts-ignore
-   const user = req.user
-   console.log(date)
+    const { date, groupId } = req.body;
 
    try {
     const result = await prisma.day.create({
         data: {
             date, 
-            groupId: user.groupId,
+            groupId
         },
     })
-    console.log(result, 'ee')
+    
     res.json(result)
    } catch (e) {
     console.log(e)

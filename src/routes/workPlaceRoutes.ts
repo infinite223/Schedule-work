@@ -5,15 +5,13 @@ const router = Router();
 const prisma = new PrismaClient();
 
 router.post('/', async (req, res) => {
-    const { name } = req.body;
-    //@ts-ignore
-   const user = req.user
+    const { name, userId } = req.body;
 
    try {
     const result = await prisma.workPlace.create({
         data: {
             name,
-            adminId: user.id
+            adminId: userId
         }
     })
 

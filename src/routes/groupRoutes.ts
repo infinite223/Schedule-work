@@ -5,14 +5,11 @@ const prisma = new PrismaClient();
 const router = Router();
 
 router.post('/', async (req, res) => {
-    const { name, description } = req.body;
-    //@ts-ignore
-   const user = req.user
-   console.log('tu', user, 's')
+    const { name, description, workPlaceId } = req.body;
    try {
     const result = await prisma.group.create({
         data: {
-            name, description, workPlaceId: user.workPlaceId
+            name, description, workPlaceId
         },
         include: { users: {} }
     })
@@ -26,9 +23,7 @@ router.post('/', async (req, res) => {
 
 router.post('/addUserToGroup', async (req, res) => {
     const { userId, groupId } = req.body;
-    //@ts-ignore
-   const user = req.user
-   console.log('tu', user, 's')
+
    try {
     const result = await prisma.group.update({
         where: { id: Number(groupId)},
@@ -44,7 +39,7 @@ router.post('/addUserToGroup', async (req, res) => {
 
 router.get('/', async (req, res) => {
     const { workPlaceId } = req.body;
-    console.log(workPlaceId)
+    
     const groups = await prisma.group.findMany({ where: {workPlaceId: Number(workPlaceId)} });
     res.json(groups)
 })
