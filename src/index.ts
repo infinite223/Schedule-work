@@ -5,7 +5,6 @@ import groupRoutes from './routes/groupRoutes'
 import authRoutes from './routes/authRoutes'
 import dayRoutes from './routes/dayRoutes'
 import userInDay from './routes/userInDay'
-import { authenticateToken } from './middlewares/authMiddleware'
 
 const app = experss(); 
 app.use(experss.json());
